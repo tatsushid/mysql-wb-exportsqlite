@@ -322,6 +322,8 @@ def exportSQLite(cat):
     def order_tables(out, db_name, schema, unordered, respect_deferredness):
         have_ordered = False
         while not have_ordered:
+            if len(unordered) == 0:
+                have_ordered = True
             for tbl in unordered.values():
                 has_forward_reference = False
                 for fkey in tbl.foreignKeys:
