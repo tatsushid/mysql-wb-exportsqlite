@@ -465,7 +465,7 @@ def exportSQLite(cat):
     out.close()
 
     wizard = ExportSQLiteWizard(sql_text)
-    wizard.run(True)
+    wizard.run()
 
     return 0
 
