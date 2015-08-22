@@ -305,7 +305,7 @@ def exportSQLite(cat):
                             'Error', 'Unrecognized column in inserts')
 
             out.write('INSERT INTO %s(' % dq(tbl.name))
-            for i in range(last_column):
+            for i in range(last_column + 1):
                 if i > 0:
                     out.write(',')
                 out.write(dq(tbl.columns[i].name))
@@ -316,7 +316,7 @@ def exportSQLite(cat):
             columns_values = columns_values[9:]
 
             out.write(') VALUES(')
-            out.write(columns_values.replace("'", "''"))
+            out.write(columns_values.replace("\\'", "''"))
             out.write('\n')
 
     def order_tables(out, db_name, schema, unordered, respect_deferredness):
