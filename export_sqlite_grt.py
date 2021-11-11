@@ -17,12 +17,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
-import StringIO
+from io import StringIO
 
 import grt
 import mforms
 
-from grt.modules import Workbench
 from wb import DefineModule, wbinputs
 from workbench.ui import WizardForm, WizardPage
 from mforms import newButton, newCodeEditor, FileChooser
@@ -51,7 +50,7 @@ def exportSQLite(cat):
         for i, schema in enumerate(cat.schemata):
             if schema.name in idt:
                 have_errors = True
-                if Workbench.confirm('Name conflict',
+                if grt.modules.Workbench.confirm('Name conflict',
                         'Schemas %d and %d have the same name "%s".'
                         ' Please rename one of them.\n'
                         'Search for more such errors?' % (
@@ -69,7 +68,7 @@ def exportSQLite(cat):
             for i, tbl in enumerate(schema.tables):
                 if tbl.name == '':
                     have_errors = True
-                    if Workbench.confirm('Name conflict',
+                    if grt.modules.Workbench.confirm('Name conflict',
                             'Table %d in schema "%s". has no name.'
                             ' Please rename.\n'
                             'Search for more such errors?' % (
@@ -77,7 +76,7 @@ def exportSQLite(cat):
                         return False
                 if tbl.name in idt:
                     have_errors = True
-                    if Workbench.confirm('Name conflict',
+                    if grt.modules.Workbench.confirm('Name conflict',
                             'Tables %d and %d in schema "%s"'
                             ' have the same name "%s".'
                             ' Please rename one of them.\n'
@@ -96,7 +95,7 @@ def exportSQLite(cat):
                 for i, column in enumerate(tbl.columns):
                     if column.name == '':
                         have_errors = True
-                        if Workbench.confirm('Name conflict',
+                        if grt.modules.Workbench.confirm('Name conflict',
                                 'Column %d in table "%s"."%s". has no name.'
                                 ' Please rename.\n'
                                 'Search for more such errors?' % (
@@ -104,7 +103,7 @@ def exportSQLite(cat):
                             return False
                     if column.name in idt:
                         have_errors = True
-                        if Workbench.confirm('Name conflict',
+                        if grt.modules.Workbench.confirm('Name conflict',
                                 'Columns %d and %d in table "%s"."%s"'
                                 ' have the same name "%s".'
                                 ' Please rename one of them.\n'
@@ -124,7 +123,7 @@ def exportSQLite(cat):
                     if index.indexType == 'INDEX':
                         if index.name == '':
                             have_errors = True
-                            if Workbench.confirm('Name conflict',
+                            if grt.modules.Workbench.confirm('Name conflict',
                                     'Index %d in table "%s"."%s". has no name.'
                                     ' Please rename.\n'
                                     'Search for more such errors?' % (
@@ -132,7 +131,7 @@ def exportSQLite(cat):
                                 return False
                         if index.name in idt:
                             have_errors = True
-                            if Workbench.confirm('Name conflict',
+                            if grt.modules.Workbench.confirm('Name conflict',
                                     'Indices %d and %d in table "%s"."%s"'
                                     ' have the same name "%s".'
                                     ' Please rename one of them.\n'
@@ -324,7 +323,7 @@ def exportSQLite(cat):
         while not have_ordered:
             if len(unordered) == 0:
                 have_ordered = True
-            for tbl in unordered.values():
+            for tbl in list(unordered.values()):
                 has_forward_reference = False
                 for fkey in tbl.foreignKeys:
                     if (fkey.referencedTable.name in unordered and
@@ -435,7 +434,7 @@ def exportSQLite(cat):
     if not validate_for_sqlite_export(cat):
         return 1
 
-    out = StringIO.StringIO()
+    out = StringIO()
     out.write(info_format(
                 'Creator',
                 'MySQL Workbench %d.%d.%d/ExportSQLite Plugin %s\n' % (
@@ -458,7 +457,7 @@ def exportSQLite(cat):
         for schema in [(s, s.name == 'main') for s in cat.schemata]:
             export_schema(out, schema[0], schema[1])
     except ExportSQLiteError as e:
-        Workbench.confirm(e.typ, e.message)
+        grt.modules.Workbench.confirm(e.typ, e.message)
         return 1
 
     sql_text = out.getvalue()
